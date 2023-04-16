@@ -1,3 +1,4 @@
+;;https://www.cs.cmu.edu/~dst/LispBook/book.pdf
 ;;; 1.2
 (print(- (/ 18 4) (* 3 5) (+ 1 1)))
 (print(sqrt(abs(- (/ 18 4)(* 3 5)(+ 1 1)))))
@@ -851,6 +852,178 @@ AND.
 ;;AND X Y Z W should return true since they are not nil unless they are tied to something
 ;;if anything in the cond returns nil then return nil
 ;;store the variables returned in cond in a LIST and iterate over them to check if any are nil
-(defun test333 (x y z w)
-  (let (()))
-  (cond ((numberp x) 't))	       
+
+
+(defun compare (x y)
+  (cond ((equal x y) 'numbers-are-the-same)
+	((< x y) 'first-is-smaller)
+	((> x y) 'second-is-smaller)))
+
+(defun if-compare (x y)
+  (if (equal x y)
+      (print 'numbers-are-the-same)
+      (if (< x y)
+	  (print 'first-is-smaller)
+	  (if (> x y)
+	      (print 'second-is-smaller)))))
+
+(defun and-compare (x y)
+  (or (and (equal x y) 'numbers-are-the-same)
+      (and (< x y) 'first-is-smaller)
+      (and (> x y) 'second-is-smaller)
+      'no))
+
+#||
+Use COND to write a predicate BOILINGP that takes two inputs,
+TEMP and SCALE, and returns T if the temperature is above the
+boiling point of water on the specified scale. If the scale is
+FAHRENHEIT, the boiling point is 212 degrees; if CELSIUS, the
+boiling point is 100 degrees. Also write versions using IF and
+AND/OR instead of COND
+||#
+
+(defun boilingp (temp scale)
+  (let ((bp-celcius 100)
+	(bp-farenheit 212))
+    (cond ((equal scale 'fahrenheit)
+	   ( >= temp bp-farenheit))
+	  ((equal scale 'celcius)
+	   ( >= temp bp-celcius)))))
+
+
+
+
+(defun and-boiling-p (temp scale)
+  (or (and (equal scale 'fahrenheit)
+	   (>= temp 212))
+      t
+      (and (equal scale 'celcius)
+	   (>= temp 100))
+      t))
+
+;;pg 144
+(defun logical-and-p (x y)
+  "if x or y are nil returns nil"
+  (and x y t))
+
+(defun logical-cond-p (x y)
+  "unless x and y are nil returns true"
+  (cond	(x t)
+	(y t)))
+
+(defun logical-if-p (x y)
+  (if (or x y)
+      t
+      nil))
+
+;;Write LOGICAL-OR. Make sure it returns only T or NIL for its result.
+
+(defun logical-or (x y)
+  (if (or x y)
+      t
+      nil))
+
+;;demorgans theorum
+
+(defun demorgan-and (x y z)
+  (not (or (not x)
+	   (not y)
+	   (not z))))
+
+(defun demorgan-or (x y z)
+  (not (and (not x)
+	    (not y)
+	    (not z))))
+
+(defun nand (x y)
+  (not (and x y)))
+
+(defun nand-and (x y)
+  (not(nand x y))))
+
+;;https://www.youtube.com/watch?v=JQBRzsPhw2w
+;;0 is nil
+;;1 is t
+;;binary numbers for transistors
+;; nil is 0V and t is usually 5V but can be anything other then 0V
+;;circuits 0 is off, 1 is on
+;;not it like a light switch
+
+(defun not-logic-gate (voltage)
+  (not voltage))
+
+(defun and-logic-gate (a b)
+  "The only way for the voltage to run through, is if both inputs a AND b are true"
+  ;;anything * 0 is 0, this is why all inputs have to be true to return true in and gates
+  (* a b))
+
+(defun or-logic-gate (a b)
+  (+ a b))
+
+;;nand gate does the opposite of the input of the and gate
+
+(defun nand-gate (a b)
+  (not-logic-gate (and-logic-gate a b)))
+
+;;boolean algebra
+;; if the input is (a a)
+;; then the and logic gate results in a
+;;1 *1 is 1
+;;0 * 0 is 0
+
+(defun booleantest (on on)
+  (nand-logic-gate on on))
+;;now it is off and is theeqivilent of just using not
+
+(defun proper-not (voltage)
+  (if (null voltage)
+      t
+      nil))
+
+;;better nand gate using the proper-not
+(defun proper-not-and (a b)
+  (proper-not (and-logic-gate a b)))
+
+;;nor gate
+
+(defun not-or (a b)
+  (proper-not (or a b)))
+
+;;answering the questions in the book
+
+(defun not-not-and-is-and-really (a b)
+  (proper-not-and (proper-not a) (proper-not b)))
+
+;; you cant contruct using only nand because it requires two inputs unless you use cons?
+
+;;this should be the answer because of boolean algebra
+(defun tryingagain (a b)
+  (proper-not-and (proper-not-and a a) (proper-not-and b b)))
+
+(defun not-not-or (a b)
+  (not-or (not-or a a) (not-or b b)))
+
+;;the video at 22:59
+;;f = xy+ xy'
+;;or is addinf and and is *
+
+(defun functionyay (x y)
+  (or-logic-gate (and-logic-gate x y)
+		 (and-logic-gate x (proper-not-and y y))))
+
+;;to summarise you can make anything with just nand and nor
+;;any equation, any logical function and any circuit since circuits are reliant on booelan arithmatic
+;;"everything is true if it is not nil"
+;;you can create something very complex and not get confused if you use logic gates
+;; f = mx + c
+;;you can even redo functionyay to only take one function
+
+(defun functionyay (x y)
+  (not-not-or (proper-not-and (proper-not x) (proper-not y))
+	      (and-logic-gate x (not (proper-not-and (not y) (not y))))))
+
+;;but doing this will confuse someone very quickly :) unless that is what you want, but it can confuse you in the future if you need to fix it!
+  ;;what is in the function does not matter so much, as long as it returns the correct output
+
+;;and an or is not as logically complete as nand and nor because it does not include not
+
