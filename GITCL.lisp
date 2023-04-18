@@ -51,15 +51,15 @@
   (and (integerp n)
        (> n 1)
        (if (or (= n 2)
-	      (= n 3)
-	      (= n 5)
-	      (= n 7))
+	       (= n 3)
+	       (= n 5)
+	       (= n 7))
 	   t
 	   (and
-	       (not(zerop(mod n 2)))
-	       (not(zerop(mod n 3)))
-	       (not(zerop(mod n 5)))
-	       (not(zerop(mod n 7)))))))
+	    (not(zerop(mod n 2)))
+	    (not(zerop(mod n 3)))
+	    (not(zerop(mod n 5)))
+	    (not(zerop(mod n 7)))))))
 
 
 ;;Sieve of Eratosthenes
@@ -325,7 +325,7 @@ p
        unless (< 1 ( - n lpn)))))
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;;back to the book
+;;back to the book
 
 
 ;;make better
@@ -371,7 +371,7 @@ p
 
 ;;im going to make my favourite recipe, it has 3 ingredients (inputs) and the combination of them in different ratios and cooking METHODS create different dishes(outputs) then return the list of instructions for a person to follow
 (defun (egg starch milk)
-    "To make vasten vladen; milk custard"
+  "To make vasten vladen; milk custard"
   (let ))
 ;;this is nonw in file fridge.lisp because i want a cookbook
 
@@ -459,7 +459,7 @@ p
 
 (defun child (p mega)
   ;;when called mega is bond to the second provided argument.
-;;in #'parent mega becomes the value of (symbol-value n)
+  ;;in #'parent mega becomes the value of (symbol-value n)
   (list mega p))
 
 (defun alpha (x)
@@ -627,15 +627,15 @@ Examples: (PLAY ’ROCK ’SCISSORS) should return FIRST-WINS.
 
 (defun player1-wins-p (player1 player2)
   (or 
-  ;;win-condition1
-  (and (equalp player1 'rock)
-       (equalp player2 'scissors))
-  ;;win-condition2
-  (and (equalp player1 'scissors)
-       (equalp player2 'paper))
-  ;;win-condition3
-  (and (equalp player1 'paper)
-       (equalp player2 'rock))))
+   ;;win-condition1
+   (and (equalp player1 'rock)
+	(equalp player2 'scissors))
+   ;;win-condition2
+   (and (equalp player1 'scissors)
+	(equalp player2 'paper))
+   ;;win-condition3
+   (and (equalp player1 'paper)
+	(equalp player2 'rock))))
 
 (defun tiep (player1 player2)
   (equalp player1 player2))
@@ -819,7 +819,7 @@ AND/OR instead of COND
 	      (and-logic-gate x (not (proper-not-and (not y) (not y))))))
 
 ;;but doing this will confuse someone very quickly :) unless that is what you want, but it can confuse you in the future if you need to fix it!
-  ;;what is in the function does not matter so much, as long as it returns the correct output
+;;what is in the function does not matter so much, as long as it returns the correct output
 
 ;;and an or is not as logically complete as nand and nor because it does not include not
 
@@ -866,7 +866,7 @@ AND/OR instead of COND
 
 (defun good-style (p)
   (let ((a (+ p 5)))
-	;;instead of destructivly re-assigning p, you assign the sum to a which is stored localy
+    ;;instead of destructivly re-assigning p, you assign the sum to a which is stored localy
     (list 'result 'is a)))
 
 (defun lambda-style (p)
@@ -874,4 +874,133 @@ AND/OR instead of COND
   (lambda () (list 'result 'is (+ p 5))))
 
 ;;side effects of variables can cause bugs where the program compiles but it doesnt work as intended
+;;this is why you need unit testing or why you need to continiusly test while you are coding
 
+;;pg 163 keyboard exercise
+#|| 
+Write a function THROW-DIE that returns a random number from 1
+to 6, inclusive. Remember that (RANDOM 6) will pick numbers
+from 0 to 5. THROW-DIE doesn’t need any inputs, so its argument
+list should be NIL
+||#
+
+(defun throw-die()
+  "Returns a random number that is 1 >= x >= 7"
+  (let ((value (random 7)))
+    (if (zerop value)
+	(throw-die)
+	value)))
+
+(defun throw-dice ()
+  "Returns two random numbers in a list"
+  (let ((throw (list (throw-die) (throw-die))))
+    throw))
+
+(defun snake-eyes-p (throw)
+  "Returns T or Nil if the input is '(1 1)"
+  (let ((snake-eyes '(1 1)))
+    (equalp throw snake-eyes)))
+
+(defun boxcars-p (throw)
+  "Returns T or nil if the input it '(6 6)"
+  (let ((boxcars '(6 6)))
+    (equalp throw boxcars)))
+
+(defun instant-win-p (throw)
+  "Returns T if the sum of your throw equals to 7 or 11, you win!"
+  (let ((sum (apply '+ throw)))
+    (or (equalp 7 sum)
+	(equalp 11 sum))))
+
+(defun instant-loss-p (throw)
+  "Returns T if the sum of your throw equals to 2, 3 or 12, you lose!"
+  (let ((sum (apply '+ throw)))
+    (or (equalp 2 sum)
+	(equalp 3 sum)
+	(equalp 12 sum))))
+
+(defun say-snake-eyes (throw)
+  "Says snake-eyes when true, when not true returns nil"
+  (when (snake-eyes-p throw)
+    'SNAKE-EYES))
+
+(defun say-boxcars (throw)
+  "Says boxcars when true, when not true returns nil"
+  (when (boxcars-p throw)
+    'BOX-CARS))
+
+(defun sum-dice (throw)
+  (apply '+ throw))
+
+(defun say-points (throw)
+  (list 'your 'point 'is (sum-dice throw)))
+
+(defun say-instant-win (throw)
+  "Says snake-eyes when true, when not true returns nil"
+  (when (instant-win-p throw)
+    'you-win))
+
+(defun say-instant-loss (throw)
+  "Says boxcars when true, when not true returns nil"
+  (when (instant-loss-p throw)
+    'you-lose))
+
+(defun say-throw (throw)
+  "Says boxcars or snake-eyes if they are true"
+  (or (say-boxcars throw)
+      (say-snake-eyes throw)
+      (sum-dice throw)))
+
+
+
+#||
+If you don’t win or lose on the first throw of the dice, the value you
+threw becomes your ‘‘point,’’ which will be explained shortly.
+Write a function (CRAPS) that produces the following sort of
+behavior. Your solution should make use of the functions you wrote
+in previous steps.
+> (craps)
+(THROW 1 AND 1 -- SNAKEYES -- YOU LOSE)
+> (craps)
+(THROW 3 AND 4 -- 7 -- YOU WIN)
+> (craps)
+(THROW 2 AND 4 -- YOUR POINT IS 6)
+||#
+;;
+
+;;if yo get a win or loss condition you put in say-throw, if you dont then you say the point
+
+(defun craps ()
+  (cond ((instant-win-p throw)
+	 (list 'throw (car throw) 'and (cadr throw) '--
+	       (say-throw throw) '-- 'You 'win))
+	((instant-loss-p throw)
+	 (list 'throw (car throw) 'and (cadr throw) '--
+	       (say-throw throw) '-- 'You 'lose))
+	(let ((throw (throw-dice)))
+	  (t (list  'throw (car throw) 'and (cadr throw) '--
+		    'your 'point 'is (sum-dice throw))
+	     ;;store the point and recall the function
+	     ;;if the point is the same as the previous point the you win
+	     ;;if the point is not the same as the previous point then try again
+	     ;;but if you throw snake-eyes you lose.
+	     ))))
+
+
+(defun try-for-point (previous-point)
+  (let* ((throw (throw-dice))
+	 (new-point (sum-dice throw)))
+    (if (equalp 7 new-point)
+	(list 'throw (car throw) 'and (cadr throw) '--
+	      (say-throw throw) '-- 'You 'lose)
+	(if (equalp new-point previous-point)
+	    (list 'throw (car throw) 'and (cadr throw) '--
+		  (say-throw throw) '-- 'you 'win)
+	    (list 'throw (car throw) 'and (cadr throw) '--
+		  (say-throw throw) '-- 'try 'again)))))
+
+
+
+
+
+  
