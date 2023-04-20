@@ -999,8 +999,108 @@ in previous steps.
 	    (list 'throw (car throw) 'and (cadr throw) '--
 		  (say-throw throw) '-- 'try 'again)))))
 
+;;pg 181
+(defparameter *line*
+  '(roses are red))
 
+(reverse *line*)
+;;(red are roses)
 
+(first (last *line*))
+;;red
 
+(nth 1 line)
+;;are
 
-  
+(reverse (reverse *line*))
+;;(roses are red)
+
+(append *line* (list (first *line*)))
+;;(roses are red roses)
+
+(append (last *line*) *line*)
+;;(red roses are red)
+
+(list (first *line*) (last *line*))
+;;(roses (red))
+
+(cons (last *line*) *line*)
+;;((red) roses are red)
+
+(remove 'are *line*)
+;;(roses red)
+
+(append *line* '(violets are blue))
+;;(roses are red violets are blue)
+
+;;Use the LAST function to write a function called LAST-ELEMENT
+;;that returns the last element of a list instead of the last cons cell.
+(defun last-element (list)
+  (first (last list)))
+
+;;another version of LAST-ELEMENT using REVERSE instead of last
+
+(defun last-element2 (list)
+  (first (reverse list)))
+;;the first one is faster because reverse is like dolist
+
+;;Write another version using NTH and LENGTH.
+(defun last-element3 (list)
+  (nth (1- (length list)) list))
+;;the first one is still faster then this one
+
+;;Use REVERSE to write a NEXT-TO-LAST function that returns the
+;;next-to-last element of a list. Write another version using NTH.
+(defun next-to-last (list)
+  (second (reverse list)))
+
+(defun next-to-last2 (list)
+  (nth (- (length list) 2) list))
+
+;;Write a function MY-BUTLAST that returns a list with the last element
+;;removed. (MY-BUTLAST ’(ROSES ARE RED)) should return the list
+;;(ROSES ARE). (MY-BUTLAST ’(G A G A)) should return (G A G)
+
+(defun my-butlast (list)
+  (reverse (rest (reverse list))))
+
+;;(defun mystery (x) (first (last (reverse x))))
+
+(defun mystery (x)
+  (first x))
+
+#|| 
+6.10. A palindrome is a sequence that reads the same forwards and
+backwards. The list (A B C D C B A) is a palindrome; (A B C A B C)
+is not. Write a function PALINDROMEP that returns T if its input is a
+palindrome
+||#
+
+;;chech to see if the list is symmetrical
+;;is the reverse of the list the same as te normal order of the list?
+
+(defun palindromep (list)
+  (equalp list (reverse list)))
+
+#||
+Write a function MAKE-PALINDROME that makes a palindrome out
+of a list, for example, given (YOU AND ME) as input it should return
+(YOU AND ME ME AND YOU).
+||#
+
+(defun make-palindrome (list)
+  (append list (reverse list)))
+;;CL-USER> (make-palindrome '(1 2 3 4 5 6 7))
+;;(1 2 3 4 5 6 7 7 6 5 4 3 2 1)
+
+(defun make-palindrome2 (list)
+  (append list (rest (reverse list))))
+;;CL-USER> (make-palindrome2 '(1 2 3 4 5 6 7))
+;;(1 2 3 4 5 6 7 6 5 4 3 2 1)
+
+;;6.12 no it just returns it doesnt cycle through and make a new list
+
+;;intersection takes the common elements in two lists
+
+;;6.13 you get nil because () is the only common element
+;;6.14 you should get all the common elements
