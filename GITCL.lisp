@@ -1104,3 +1104,49 @@ of a list, for example, given (YOU AND ME) as input it should return
 
 ;;6.13 you get nil because () is the only common element
 ;;6.14 you should get all the common elements
+;;6.15
+(defun contains-article-p (set)
+  (intersection '(the a an) set))
+
+(defun contains-article-p2 (set)
+  (or (member 'the set)
+      (member 'a set)
+      (member 'an set)))
+
+;;and and or are two completely different functions and i spent 30 minutes trying to make one the other
+
+(defun add-vowels (set)
+  (union set '(A E I O U)))
+
+;;the first value of set-difference needs to be copied to return anything
+;;if the first value is nil the return value is nil
+;;but if the first value is full of symbols and the last value is nil it just returns the first value
+
+(defun my-subsetp (setx sety)
+  (if (set-difference setx sety)
+      'nil
+      't))
+
+;;6.22. Suppose the global variable A is bound to the list (SOAP WATER).
+;;What will be the result of each of the following expressions?
+
+(defparameter *a* (list 'SOAP 'WATER)))
+
+;;(union *a* '(no soap radio))
+;;(radio no soap water)
+
+;;(intersection *a* (reverse *a*))
+;;(reverse *a*) = (water soap)
+;;all the common elements (water soap)
+
+;;(set-difference a '(stop for water))
+;;(soap)
+
+;;(set-difference a a)
+;; there is no difference between the two lists so it doesnt matter
+
+;;(member 'soap *a*)
+;;(soap water)
+
+;;(member 'water a)
+;(water)
