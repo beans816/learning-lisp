@@ -1,4 +1,5 @@
 ;;https://www.cs.cmu.edu/~dst/LispBook/book.pdf
+
 ;;; 1.2
 (print(- (/ 18 4) (* 3 5) (+ 1 1)))
 (print(sqrt(abs(- (/ 18 4)(* 3 5)(+ 1 1)))))
@@ -735,7 +736,7 @@ AND/OR instead of COND
   (not (and x y)))
 
 (defun nand-and (x y)
-  (not(nand x y))))
+  (not(nand x y)))
 
 ;;https://www.youtube.com/watch?v=JQBRzsPhw2w
 ;;0 is nil
@@ -1130,7 +1131,7 @@ of a list, for example, given (YOU AND ME) as input it should return
 ;;6.22. Suppose the global variable A is bound to the list (SOAP WATER).
 ;;What will be the result of each of the following expressions?
 
-(defparameter *a* (list 'SOAP 'WATER)))
+(defparameter *a* (list 'SOAP 'WATER))
 
 ;;(union *a* '(no soap radio))
 ;;(radio no soap water)
@@ -1148,5 +1149,193 @@ of a list, for example, given (YOU AND ME) as input it should return
 ;;(member 'soap *a*)
 ;;(soap water)
 
-;;(member 'water a)
-;(water)
+;;(member 'water *a*)
+;;(water)
+
+;;(member 'washcloth *a*)
+;;nil
+
+;;The cardinality of a set is the number of elements it contains. What
+;;Lisp primitive determines the cardinality of a set? the length
+
+;;check if something is cardinal like ying yang
+(defun set-equalp (setx sety)
+  (and (equalp (length setx) (length sety))
+       (subsetp setx sety)))
+
+;;if X is a subset of Y but not equal
+;;to Y then it is the function properset
+
+(defun properset (setx sety)
+  (and (subsetp setx sety)
+       (not (set-equalp setx sety))))
+
+;;why abc is not a proper subset of bca
+
+;;6.26. We are going to write a program that compares the descriptions of two
+;; objects and tells how many features they have in common. The
+;; descriptions will be represented as a list of features, with the symbol
+;; -VS- separating the first object from the second. Thus, when given a
+;; list like
+;; (large red shiny cube -vs-
+;; small shiny red four-sided pyramid)
+;; the program will respond with (2 COMMON FEATURES). We will
+;; compose this program from several small functions that you will write
+;; and test one at a time.
+;; so red and shiny are common things in the list
+
+;;a. Write a function RIGHT-SIDE that returns all the features to the
+;; right of the -VS- symbol. RIGHT-SIDE of the list shown above
+;; should return (SMALL SHINY RED FOUR-SIDED PYRAMID).
+;; Hint: remember that the MEMBER function returns the entire
+;; sublist starting with the item for which you are searching. Test your
+;; function to make sure it works correctly.
+
+;;this is treating -vs- as the starting point value and then excluding it like list when you look sraight ahead and turn your head to the right and to the left. or you are treating -vs- like a mirror and trying to find the similarities between two things, you you should know tha you can make a lage red shiny cube from a small shiny red foursided pyramid so they are also similiar in that way.
+
+;;(large red shiny cube -vs- small shiny red foursided pyramid)
+
+(defun right-side (list)
+  (rest (member '-vs- list)))
+
+;; Write a function LEFT-SIDE that returns all the features to the left
+;; of the -VS-. You can’t use the MEMBER trick directly for this one,
+;; but you can use it if you do something to the list first.
+
+(defun left-side (list)
+  (rest (member '-vs- (reverse list))))
+
+;;Write a function COUNT-COMMON that returns the number of
+;;features the left and right sides of the input have in common.
+
+;;treat the two as a list and then compare them using subset
+
+(defun count-common (list)
+  (length (intersection (right-side list) (left-side list))))
+
+;;now it is red and shiny but now we must count how many elements are in the list
+
+;;Write the main function, COMPARE, that takes a list of features
+;;describing two objects, with a -VS- between them, and reports the
+;;number of features they have in common. COMPARE should return
+;;a list of form (n COMMON FEATURES).
+
+;;add some words i suppose
+
+(defun compare (list)
+  (list (count-common list) 'common 'features))
+;;lol
+
+;;this program needs to be more symmetrical because the lists are similar in four ways
+;;http://s3.amazonaws.com/illustrativemathematics/images/000/003/233/large/Pyramid_in_Cube_395485726d46ab8fabecc1085c48d4ca.png?1403105489
+;;its egypt now
+;;(large red shiny cube -vs- four small shiny red foursided pyramids)
+
+(defun set-equal ()
+  (setq (equal (right-side list) (left-side list))))
+
+;;the book is a bit outdated
+(defparameter *words*
+  '((one . un)
+    (two . deux)
+    (three . trois)
+    (four . quatre)
+    (five . cinq)))
+
+;;6.27 technically but doing that is a bit inelegant
+;;'(assoc . rassoc) you use rassoc to search by using the cdr and assoc to seach by the car
+
+;;(assoc 'three *words*)
+;;(rassoc 'trois *words*)
+
+(defparameter *things*
+  '((object1 large green shiny cube)
+   (object2 small red dull metal cube)
+   (object3 red small dull plastic cube)
+   (object4 small dull blue metal cube)
+   (object5 small shiny red four-sided pyramid)
+   (object6 large shiny green sphere)))
+
+;;this is bad use of assoc
+
+(defun description (x)
+  (rest (assoc x *things*)))
+
+(defun differences (x y)
+  (set-exclusive-or (description x)
+		    (description y)))
+;;this is like set-difference!
+
+;;6.29 length
+
+(defparameter *books*
+    '((Pride-and-Prejudice . Jane-Austen)
+      (I-can-count-the-petals-of-flowers . John-Wahl-Stacey-Wahl)
+      (Symbols-of-sacred-science . Rene-Guenon)
+      (One-is-fun! . Delia-Smith)
+      (A-Country-Called-Stratherrick . Alan-B-Lawson)))
+
+(defun who-wrote (name-of-book)
+  (cdr (assoc name-of-book *books*)))
+
+;;it shouldnt change at all
+
+;;the table would have to have the author name first and then it would work with assoc
+
+(defparameter *atlas*
+  '((pennsylvania (pittsburg
+		   johnstown))
+    (new-jersey (newark
+		 princeton
+		 trenton))
+    (ohio (columbus))))
+
+;; In this problem we will simulate the behavior of a very simple-minded
+;; creature, Nerdus Americanis (also known as Computerus Hackerus ).
+;; This creature has only five states: Sleeping, Eating, Waiting-for-a-
+;; Computer, Programming, and Debugging. Its behavior is cyclic: After
+;; it sleeps it always eats, after it eats it always waits for a computer, and
+;; so on, until after debugging it goes back to sleep for a while.
+;;very cringe but kinda cool
+
+;; What type of data structure would be useful for representing the
+;; connection between a state and its successor? Write such a data
+;; structure for the five-state cycle given above, and store it in a global
+;; variable called NERD-STATES
+
+(defparameter *nerd-states*
+  '(sleeping eating waiting-for-a-computer programming debugging))
+
+(defun nerd-cycle-sucessor (state)
+  (second (member state *nerd-states*)))
+
+;;sleeping eating
+;;eating waiting-for-a-computer
+;;waiting-for-a-computer programming
+;;programming debugging
+;;debugging sleeping
+
+(defparameter *nerd-states*
+  '((sleeping . eating)
+    (eating . waiting-for-a-computer)
+    (waiting-for-a-computer . programming)
+    (programming . debugging)
+    (debugging . sleeping)))
+
+(defun nerdus (state)
+  (cdr (assoc state *nerd-states*)))
+
+(defun sleepless-nerd (state)
+  (if (equalp 'debugging state)
+      'eating
+      (nerdus state)))
+
+(defun sleepless-days (one-state-cycle-number)
+  (let ((new-state 'eating))
+    (dotimes (i one-state-cycle-number new-state)
+      (setf new-state (sleepless-nerd new-state))
+      (print new-state))))
+
+;;nerd on caffiene is xn + 2
+(defun nerd-on-caffiene ()
+  )
