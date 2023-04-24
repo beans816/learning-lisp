@@ -1337,5 +1337,48 @@ of a list, for example, given (YOU AND ME) as input it should return
       (print new-state))))
 
 ;;nerd on caffiene is xn + 2
-(defun nerd-on-caffiene ()
-  )
+(defun nerd-on-caffiene (state)
+  (nerdus (nerdus state)))
+
+(defun nerd-cycle-on-caffiene (one-cycle-number)
+  (let ((new-state 'programming))
+    (dotimes (i one-cycle-number new-state)
+      (setf new-state (nerd-on-caffiene new-state))
+      (print new-state))))
+;;3
+
+;;exercises
+;;swap-first-last
+;;defun laste element of a list
+
+
+(defun middle-elements (list)
+  (butlast (rest list)))
+
+
+(defun swap-first-last (list)
+  (append (last list) (middle-elements list) (list (first list))))
+
+;;rotate like a cesearean cipher clockwise
+;;the first becomes the last
+;;the second becomes the first
+
+(defun rotate-left (list)
+  (append (rest list) (list (first list))))
+
+(defun rotate-right (list)
+  (append (last list) (butlast list)))
+
+;;when you do set-difference '(a b c) '(a b c) the output is the same when ou rotate them. You do the same when you have the input as () ()
+;;equalp nil nil returns t
+
+;;cons 
+
+;;Show how to transform the list (A B C D) into a table so that the
+;;ASSOC function using the table gives the same result as MEMBER
+;;using the list.
+
+(defparameter *test* '((a . nil) (b . nil) (c . nil) (d . nil)))
+
+;;this is very hacky
+
