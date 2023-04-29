@@ -1382,3 +1382,74 @@ of a list, for example, given (YOU AND ME) as input it should return
 
 ;;this is very hacky
 
+(defparameter *rooms*
+  '((living-room (north front-stairs)
+     (south dining-room)
+     (east kitchen))
+    (upstairs-bedroom (west library)
+     (south front-stairs))
+    (dining-room (north living-room)
+     (east pantry)
+     (west downstairs-bedroom))
+    (kitchen (west living-room)
+     (south pantry))
+    (pantry (north kitchen)
+     (west dining-room))
+    (downstairs-bedroom (north back-stairs)
+     (east dining-room))
+    (back-stairs (south downstairs-bedroom)
+     (north library))
+    (front-stairs (north upstairs-bedroom)
+     (south living-room))
+    (library (east upstairs-bedroom)
+     (south back-stairs))))
+
+#||
+Write a function CHOICES that takes the name of a room as input
+and returns the table of permissible directions Robbie may take from
+that room. For example, (CHOICES ’PANTRY) should return the
+list ((NORTH KITCHEN) (WEST DINING-ROOM)). Test your
+function to make sure it returns the correct result.
+||#
+
+(defun choices (name-of-room)
+  (rest (assoc name-of-room *rooms*)))
+
+#||
+Write a function LOOK that takes two inputs, a direction and a
+room, and tells where Robbie would end up if he moved in that
+direction from that room. For example, (LOOK ’NORTH
+’PANTRY) should return KITCHEN. (LOOK ’WEST ’PANTRY)
+should return DINING-ROOM. (LOOK ’SOUTH ’PANTRY)
+should return NIL. Hint: The CHOICES function will be a useful
+building block.
+||#
+
+(defun look (direction room)
+  (second (assoc direction (choices room))))
+
+(defparameter *loc* nil)
+
+(defun set-robbie-location (place)
+  "Moves Robbie to place by setting loc"
+  (setf *loc* place))
+
+(defun how-many-choices (loc)
+  (length (choices loc)))
+
+(defun upstairsp (loc)
+  (or (equalp loc 'library)
+      (equalp loc 'upstairs-bedroom)))
+
+(defun onstairsp (loc)
+  (or (equalp loc 'front-stairs)
+      (equalp loc 'back-stairs)))
+
+(defun where()
+  (cond ((upstairsp *loc*) (list 'Robbie 'is 'upstairs 'in 'the *loc*))
+	((onstairsp *loc*) (list 'Robbie 'is 'on 'the *loc*))
+	(t (list 'Robbie 'is 'downstairs 'in 'the *loc*))))
+
+
+
+
