@@ -1428,7 +1428,7 @@ building block.
 (defun look (direction room)
   (second (assoc direction (choices room))))
 
-(defparameter *loc* nil)
+(defparameter *loc* 'pantry)
 
 (defun set-robbie-location (place)
   "Moves Robbie to place by setting loc"
@@ -1450,6 +1450,331 @@ building block.
 	((onstairsp *loc*) (list 'Robbie 'is 'on 'the *loc*))
 	(t (list 'Robbie 'is 'downstairs 'in 'the *loc*))))
 
+#|| Write a function MOVE that takes one input, a direction, and moves
+Robbie in that direction. MOVE should make use of the LOOK
+function you wrote previously, and should call SET-ROBBIE-
+LOCATION to move him. If Robbie can’t move in the specified
+direction an appropriate message should be returned. For example,
+if Robbie is in the pantry, (MOVE ’SOUTH) should return
+something like (OUCH! ROBBIE HIT A WALL). (MOVE
+’NORTH) should change Robbie’s location and return (ROBBIE IS DOWNSTAIRS IN THE KITCHEN).
+||#
+
+(defun move (direction)
+  (let ((newloc (look direction *loc*)))
+    (if newloc
+	(progn (set-robbie-location newloc) (where))
+	(list 'Ouch! 'Robbie 'Hit 'a 'wall))))
+#||
+Starting from the pantry, take Robbie to the library via the back
+stairs. Then take him to the kitchen, but do not lead him through the
+downstairs bedroom on the way
+directions -> west, north, east :D
+||#
+
+;;finally finished it!
+
+;;advanced topic pg 204
+;;substitution is almost just like substitution in algebra very simple -> where x is 5 find the value of y through substitution x = xy is the same as 5 = 5y because you substitute all the values of x for 5. But it doesn't work on nested lists/trees because it only looks at the top level list. In this case it works for substituting symbols or numbers for symbols or numbers.
+;;subst is the same but it works on nested lists/trees so EVERYTHING not just the top level list
+;;replace is similar to substitution or substitute
+;;sublis works like this (sublis '((dotted . pair) (list . array)) '(List that needs to be subsituted for its dotted pair))
+(sublis '((spring . may) (showers . flowers)) '(spring showers))
+;;output will be (may flowers) a.k.a spring showers bring may flowers and it makes you smile.
+
+#|| 6.42. Write a function called ROYAL-WE that changes every occurrence of
+the symbol I in a list to the symbol WE. Calling this function on the list
+(IF I LEARN LISP I WILL BE PLEASED) should return the list (IF
+WE LEARN LISP WE WILL BE PLEASED)
+||#
+
+(defparameter *connections-to-the-past*
+  '((thai-greetings . sawatdee-ka)
+    (thai-goodbye . sawatdee-ka)
+    (farewell . greetings)
+    (good-tidings-upon-you . fare-thee-well)
+    (thai-thank-you-kindly . kawpkun-ka)
+    (thai-are-you-well . sabaai-dee-mai)
+    (thai-I-am-well . sabaai-dee)
+    (thai-well-ness-no-worries . sabaai-dee)
+    (thai-good-serenity-relaxed . sabaai)
+    (thai-yes . chai)
+    (thai-no . mai)
+    (thai-you . kun)
+    (thai-me-I . chan)
+    (thai-go . pai)
+    (padma . lotus)
+    (sanscrit-varthi . spin-cycle)
+    (sanscrit-chakra . circle)
+    (latin-borea . north)
+    (latin-hyber . past)
+    (latin-septen . seven)
+    (latin-triones . stars)
+    (old-latin-septentriones . ursa-minor)
+    (latin-ursa-minor . little-bear)
+    (celtic-arth . bear)
+    (seasons . cycle-ursa-minor)))
+
+(defun translate-meaning (list)
+  (sublis *similar-meaning* list))
+
+;;now you can speak thai, sanscrit or latin with me by breaking down the meaning of words-but they are romanised not the correct symbol. there is no punctuation in thai because the language already insinuates it. But it would be better if you actually learnt the language in your head since its faster.
+
+;;(translate-meaning '(greetings are-you-well I-am-well thank-you-kindly goodbye))
 
 
+;;atom is a predicate - if something is not a bunch of grouped things like a list then it is atomic a.k.a a building block
 
+(defun add-to-end-1 (x y)
+  (append x (list y)))
+
+(defun add-to-end-2 (x y)
+  (reverse (cons y (reverse x))))
+
+(defparameter *text* '(b a n a n a - p a n d a))
+;;remove all a's
+(remove 'a *text*)
+(remove 'a *text* :count 3)
+;;Remove also accepts a :FROM-END keyword. If its value is non-NIL,
+;;then REMOVE starts from the end of the list instead of from the beginning.
+(remove 'a *text* :count 3 :from-end t)
+
+(defparameter *cards* '((3 clubs) (5 diamonds) (ace spades)))
+
+(member '(5 diamonds) *cards* :test #’equal)
+;;((5 DIAMONDS) (ACE SPADES))
+
+;;'time (time is a symbol and a constant)
+;;list * 'after *
+
+
+(defun mydouble (n)
+  (* n 2))
+
+(defun mylistdouble (list)
+  (mapcar #'mydouble list))
+
+;;(mapcar (lambda (n) (* n 2)) '(2 4 6 5))
+;;(mapcar #'first '((1 3 4) (3 4 6) (6 7 9)))
+;;mapcar maps every element in a list and 'applies' the function to it
+;;(mapcar #'+ '(1 2 3 4) '(1 2 3 4)) using two lists of equal length and adds them and then con's the sum values together to form a list 
+;;(mapcar #'first '())
+;;(mapcar (lambda (&rest list) (apply #'+ list)) '(1 2 3 4 5) '(1 2 3 4 5))
+;;(mapcar (lambda (n y) (+ n y)) '(1 2 3 4 5) '(1 2 3 4 5))
+;;(mapcar #'+ '(1 2 3 4) '(1 2 3 4))
+;;(mapcar #'first '((1 2 3) (3 2 4) (8 7 6)))
+
+;;Write an ADD1 function that adds one to its input. Then write an
+;;expression to add one to each element of the list (1 3 5 7 9).
+(defun add1 (n)
+  (1+ n))
+
+(defun add1list (list)
+  (mapcar #'1+ list))
+
+(defparameter *daily-planet* '((olsen jimmy 123-76-4535 cub-reporter)
+			       (kent clark 089-52-6787 reporter)
+			       (lane lois 951-26-1438 reporter)
+			       (white perry 355-16-7439 editor)))
+
+;;Each table entry consists of a last name, a first name, a social security
+;;number, and a job title. Use MAPCAR on this table to extract a list of
+;;social security numbers
+;;this would be useful to help hospitals
+
+(defun ssn()
+  (mapcar #'third *daily-planet*))
+
+;;Write an expression to apply the ZEROP predicate to each element of
+;;the list (2 0 3 4 0 -5 -6). The answer you get should be a list of Ts and
+;;NILs.
+
+(mapcar #zerop '(2 0 3 4 0 -5 -6))
+
+#||
+Suppose we want to solve a problem similar to the preceding one, but
+instead of testing whether an element is zero, we want to test whether it
+is greater than five. 
+We can’t use > directly for this because > is a
+function of two inputs; MAPCAR will only give it one input. 
+Show
+how first writing a one-input function called GREATER-THAN-FIVE-
+P would help.
+||#
+
+(mapcar (lambda (x) (> x 5)) )
+
+(defun greater-than-five-p (n)
+  (> n 5))
+
+(mapcar #'greater-than-five-p '(1 2 34 2 3))
+
+
+;;7.5 LAMBDA EXPRESSIONS
+;;this can be very useful
+;;(mapcar #’(lambda (x) (list ’hi ’there x))
+;;’(joe fred wanda))
+;;((HI THERE JOE) (HI THERE FRED) (HI THERE WANDA))
+;;(lambda (n) (- 7 n))
+
+;;Write a lambda expression that returns T if its input is T or NIL, but
+;;NIL for any other input.
+
+;;(lambda (p) (or (equal p t) (null p))
+
+;;Write a function that takes a list such as (UP DOWN UP UP) and
+;;"flips" each element, returning (DOWN UP DOWN DOWN). Your
+;;function should include a lambda expression that knows how to flip an
+;;individual element, plus an applicative operator to do this to every
+;;element of the list.
+
+;;(lambda (p) (cond (equal p t) nil) ((equal p nil) t))
+
+(defun gravity-flip (list)
+  (mapcar (lambda (gravity) (cond ((equal gravity 'up) 'down)
+				  ((equal gravity 'down) 'up)
+				  (t gravity)))
+	  list))
+
+;;CL-USER> (gravity-flip '(I am going up))
+;;(I AM GOING DOWN)
+
+;;CL-USER> (gravity-flip '(I am going up))
+;;(I AM GOING DOWN)
+
+;;(find-if #’oddp ’(2 4 6 7 8 9))
+;;7
+;;find-if returns the first element where the function returns true
+
+(defun sieve-all-odd (list)
+  (find-if (lambda (n) (if (oddp n) n)) list))
+;;doesnt work T^T
+
+
+;;writing assoc with if
+;;table of numbers to thai
+
+(defparameter *eng-num-to-thai-numb*
+  '((zero . sun)
+    (one . nung)
+    (two . song)
+    (three . sam)
+    (four . si)
+    (five . ha)
+    (six . hok)
+    (seven . chet)
+    (eight . paet)
+    (nine . kao)
+    (ten . sip)))
+
+(defun my-assoc-encode (key table)
+  (find-if #'(lambda (entry)
+	       (equal key (first entry)))
+	   table))
+#||
+Write a function that takes two inputs, X and K, and returns the first
+number in the list X that is roughly equal to K. Let’s say that ‘‘roughly
+equal’’ means no less than K − 10 and no more than K + 10.
+||#
+
+(defun thing (x k)
+  (find-if #'(lambda (n)
+	       (> (+ n 10) k (- n 10)))
+	   x))
+
+#|| Write a function FIND-NESTED that returns the first element of a list
+that is itself a non-NIL list.
+||#
+;;this is useful for encoding/translating
+
+(defun find-nested (list)
+  (first (find-if (lambda (element)
+		    (and (listp element)
+			 (not (null element))))
+		  list)))
+
+;;MINI KEYBOARD EXERCISE
+
+;;create a global variable called note-table
+;;piano!!!
+
+(defparameter *note-table*
+  '((1 . c)
+    (2 . c#)
+    (3 . d)
+    (4 . d#)
+    (5 . e)
+    (6 . f)
+    (7 . f#)
+    (8 . g)
+    (9 . g#)
+    (10 . a)
+    (11 . a#)
+    (12 . b)))
+
+;; Write a function called NUMBERS that takes a list of notes as input
+;; and returns the corresponding list of numbers. (NUMBERS ’(E D C
+;; D E E E)) should return (5 3 1 3 5 5 5). This list represents the first
+;; seven notes of ‘‘Mary Had a Little Lamb.’’
+;;this is just encoding again 
+
+(defun numbers (list-notes)
+  (mapcar #'(lambda (note)
+	      (car (rassoc note *note-table*)))
+	  list-notes))
+
+#||
+Write a function called NOTES that takes a list of numbers as input
+and returns the corresponding list of notes. (NOTES ’(5 3 1 3 5 5
+5)) should return (E D C D E E E). Hint: Since NOTE-TABLE is
+keyed by note, ASSOC can’t look up numbers in it; neither can
+RASSOC, since the elements are lists, not dotted pairs. Write your
+own table-searching function to search NOTE-TABLE by number
+instead of by note.
+||#
+
+(defun notes (list-numbers)
+  (mapcar #'(lambda (number)
+	      (cdr (assoc number *note-table*)))
+	  list-numbers))
+
+;;What can be said about (NOTES (NOTES X)) and (NUMBERS
+;;(NUMBERS X))
+;;For X a list of notes:
+;;X = (NOTES (NUMBERS X))
+;;For X a list of numbers:
+;;X = (NUMBERS (NOTES X))
+
+;;it will return nil or the original input
+
+#||
+o transpose a piece of music up by n half steps, we begin by adding
+the value n to each note in the piece. Write a function called RAISE
+that takes a number n and a list of numbers as input and raises each
+number in the list by the value n. (RAISE 5 ’(5 3 1 3 5 5 5)) should
+return (10 8 6 8 10 10 10), which is ‘‘Mary Had a Little Lamb’’
+transposed five half steps from the key of C to the key of F.
+||#
+
+(defun raise (n number-list)
+  (mapcar (lambda (number) (+ number n)) number-list))
+
+#||
+Sometimes when we raise the value of a note, we may raise it right
+into the next octave. For instance, if we raise the triad C-E-G
+represented by the list (1 5 8) into the key of F by adding five to
+each note, we get (6 10 13), or F-A-C. Here the C note, represented
+by the number 13, is an octave above the regular C, represented by
+1. Write a function called NORMALIZE that takes a list of numbers
+as input and ‘‘normalizes’’ them to make them be between 1 and 12.
+A number greater than 12 should have 12 subtracted from it; a
+number less than 1 should have 12 added to it. (NORMALIZE ’(6
+10 13)) should return (6 10 1).
+||#
+
+(defun normalize (list-numbers)
+  (mapcar (lambda (n)
+	    (cond ((> n 12) (- n 12))
+		  ((> 1 n) (+ n 12))
+		  (t n)))
+	  list-numbers))
