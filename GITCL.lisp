@@ -1631,7 +1631,8 @@ P would help.
 ;;(lambda (p) (cond (equal p t) nil) ((equal p nil) t))
 
 (defun gravity-flip (list)
-  (mapcar (lambda (gravity) (cond ((equal gravity 'up) 'down)
+  (mapcar (lambda (gravity)
+            (cond ((equal gravity 'up) 'down)
 				  ((equal gravity 'down) 'up)
 				  (t gravity)))
 	  list))
@@ -1774,7 +1775,275 @@ number less than 1 should have 12 added to it. (NORMALIZE ’(6
 
 (defun normalize (list-numbers)
   (mapcar (lambda (n)
-	    (cond ((> n 12) (- n 12))
-		  ((> 1 n) (+ n 12))
-		  (t n)))
+            (cond ((> n 12) (- n 12))
+                  ((> 1 n) (+ n 12))
+                  (t n)))
 	  list-numbers))
+
+#||
+Write a function TRANSPOSE that takes a number n and a song as
+input, and returns the song transposed by n half steps.
+(TRANSPOSE 5 ’(E D C D E E E)) should return (A G F G A A A).
+Your solution should assume the availability of the NUMBERS,
+NOTES, RAISE, and NORMALIZE functions. Try transposing
+‘‘Mary Had a Little Lamb’’ up by 11 half steps. What happens if
+you transpose it by 12 half steps? How about − 1 half steps
+||#
+
+;;take the notes
+;;covert it to numbers
+;;raise by n
+;;normalise
+;;convert to notes
+
+(defun transpose (n song)
+  (let ((numbers (numbers song)))
+    (notes (normalize (raise n numbers)))))
+
+;;))
+
+(remove-if #'numberp '(2 for 1 sale))
+
+(remove-if #'oddp '(1 2 3 4 5 6 7))
+
+(remove-if #'(lambda (x) (not (plusp x))) '(2 0 -4 6 -8 10))
+
+(remove-if-not #'plusp '(2 0 -4 6 -8 10))
+
+(remove-if-not #'oddp '(2 0 -4 6 -8 10))
+
+(remove-if-not #'(lambda (x) (> x 3))
+               '(2 4 6 8 4 2 1))
+
+(remove-if-not #'numberp
+	       '(3 apples 4 pears and 2 little plums))
+
+(remove-if-not #'symbolp
+	       '(3 apples 4 pears and 2 little plums))
+
+(defun count-zeros (x)
+  (length (remove-if-not #’zerop x)))
+
+(count-if #'zerop x)
+
+
+;;.11. Write a function to pick out those numbers in a list that are greater than one and less than five.
+
+(defun pick-out (list)
+  (remove-if-not (lambda (x) (> 5 x 1)) list))
+
+;;.12. Write a function that counts how many times the word ‘‘the’’ appears
+;;in a sentence.
+
+(defun the-count (list)
+  (count 'the list))
+
+;;Write a function that picks from a list of lists those of exactly length two.
+;; ((1 2) (1 2 3) (1 2 3) (1 2))
+
+(defun nested-two (list)
+  (remove-if-not #'(lambda (x) (equal 2 (length x))) list))
+
+;;Here is a version of SET-DIFFERENCE written with REMOVE-IF:
+
+(defun my-setdiff (x y)
+  (remove-if #'(lambda (e) (member e y))
+	     x))
+
+(defun my-intersect (list1 list2)
+  (remove-if-not (lambda (x) (member x list1))
+		 list2))
+
+;;union joins 2 lists together and removes doubles
+(defun my-union (list1 list2)
+  (append list1 (remove-if #'(lambda (x)
+			       (member x list1))
+			   list2)))
+
+#||
+In this keyboard exercise we will manipulate playing cards with
+applicative operators. A card will be represented by a list of form (rank
+suit), for example, (ACE SPADES) or (2 CLUBS). A hand will be
+represented by a list of cards.
+||#
+
+#||
+Write the functions RANK and SUIT that return the rank and suit of
+a card, respectively. (RANK ’(2 CLUBS)) should return 2, and
+(SUIT ’(2 CLUBS)) should return CLUBS.
+||#
+
+;;naming convention list-rs stands for a list that contains the rank and suit
+;;list-rs -> '(2 CLUBS)
+;;________________________________________________________________________
+;;________________________________________________________________________
+
+
+(defun rank (list-rs)
+  (first list-rs))
+
+(defun suit (list-rs)
+  (second list-rs))
+
+(defparameter *my-hand*
+  '((3 hearts)
+    (5 clubs)
+    (2 diamonds)
+    (4 diamonds)
+    (ace spades)))
+
+(defun count-suit (suit hand-of-cards)
+  (length (remove-if-not #'(lambda (x)
+                             (equal suit (suit x)))
+                         hand-of-cards)))
+
+(defun count-suit1 (suit hand-of-cards)
+  (count suit hand-of-cards :key #'suit))
+
+(defparameter *colours*
+  '((clubs black)
+     (diamonds red)
+     (hearts red)
+    (spades black)))
+
+(defun retrieve-colour (suit)
+  "Retrieves the colour of a card from the table colours"
+  (second (assoc suit *colours*)))
+
+(defun colour-of (card)
+  (retrieve-colour (suit card)))
+
+;;Write a function FIRST-RED that returns the first card of a hand
+;;that is of a red suit, or NIL if none are.
+;;check if red is in the table and if its not
+
+(defun first-red (hand-of-cards)
+  (find-if #'(lambda (card)
+              (equalp (colour-of card) 'red))
+           hand-of-cards))
+
+;;Write a function BLACK-CARDS that returns a list of all the black
+;;cards in a hand.
+
+(defun black-cards (hand-of-cards)
+  (mapcar #'(lambda (card)
+              (equalp (colour-of card) 'black))
+          hand-of-cards))
+
+#||
+list (ACE). Hint: First extract all the cards of the specified suit,
+then use another operator to get the ranks of those cards.
+||#
+
+;;write a function that takes two inputs
+;;a suit and a hand-of-cards
+;;returns the ranks of all cards
+;;what-ranks
+;;(WHAT-RANKS ’DIAMONDS MY-HAND) should return the list (2 4)
+;;make a function that returns the list of all the diamonds in my hand
+
+(defun list-suits (suit hand-of-cards)
+  "Input (list-suits 'diamonds *my-hand*) Output ((2 Diamonds) (4 Diamonds))"
+  (remove-if-not #'(lambda (x)
+                     (equal suit (suit x)))
+                 hand-of-cards))
+
+;; break it down more to find the first rank of the first list
+
+;; (defun first-rank (suit hand-of-cards)
+;;   "Input (first-rank 'diamonds *my-hand*) Output 2"
+;;   (list (caar (list-suits suit hand-of-cards))))
+
+;;how to get the first elements of two nested lists
+;;for every nested list in the list, return the first-rank
+;;so basically just use mapcar...map every car value into a list :)
+
+;; (defun all-ranks (suit hand-of-cards)
+;;   "Input (all-ranks 'diamonds *my-hand*) Output (2 4)"
+;;   (mapcar #'(lambda (x)
+;;                     (first x))
+;;                 (list-suits suit hand-of-cards))))
+
+(defun what-ranks (suit hand-of-cards)
+  "Input (all-ranks 'diamonds *my-hand*) Output (2 4)"
+  (mapcar #'first
+          (list-suits suit hand-of-cards)))
+
+;; Set the global variable ALL-RANKS to the list
+;; (2 3 4 5 6 7 8 9 10 jack queen king ace)
+;; Then write a predicate HIGHER-RANK-P that takes two cards as
+;; input and returns true if the first card has a higher rank than the
+;; second. Hint: look at the BEFOREP predicate on page 171 of
+;; Chapter 6.
+
+(defparameter *all-ranks*
+  '(2 3 4 5 6 7 8 9 10 jack queen king ace))
+
+;; (defun higher-rank-p-test1 (card1 card2)
+;;   (> (rank card1) (rank card2)))
+
+;;now it has to accept symbols as numbers
+;;jack is 11, queen is 12, king is 13 and ace is 14 or 1
+(defun beforep (x y)
+  "Returns true if X appears before Y in List"
+  (member y (member x *all-ranks*)))
+
+(defun higher-rank-p (card1 card2)
+  "Returns true if the first card has a higher rank than the second"
+  (beforep (rank card2) (rank card1)))
+
+;; Write a function HIGH-CARD that returns the highest ranked card
+;; in a hand. Hint: One way to solve this is to use FIND-IF to search a
+;; list of ranks (ordered from high to low) to find the highest rank that
+;; appears in the hand. Then use ASSOC on the hand to pick the card
+;; with that rank. Another solution would be to use REDUCE (defined
+;; in the next section) to repeatedly pick the highest card of each pair.
+
+;; make a list of all the ranking in a hand of cards
+;; compare all of them to find the highest rank with find-if
+
+
+;; (defun list-of-ranks-in-hand (hand-of-cards)
+;;   (mapcar #'first hand-of-cards))
+;;my-hand is
+;; (defparameter *my-hand*
+;;   '((3 hearts)
+;;     (5 clubs)
+;;     (2 diamonds)
+;;     (4 diamonds)
+;;     (ace spades)))
+
+;;ranks-of-cards is
+;; (list-of-ranks-in-hand *my-hand*)
+;; (3 5 2 4 ACE)
+
+;; (defun rank-card-compare (ranks-of-cards)
+;;   (let ((all-ranks (reverse *all-ranks*)))
+;;     (find-if #'(lambda (x)
+;;                  (find x ranks-of-cards))
+;;              all-ranks)))
+
+(defun high-card (hand-of-cards)
+  "Returns the highest ranked card in a hand"
+  (assoc (find-if #'(lambda (x)
+                      (assoc x hand-of-cards))
+                  *all-ranks* :from-end t)
+         hand-of-cards))
+
+#||
+.16. Suppose we had a list of sets ((A B C) (C D A) (F B D) (G)) that we
+wanted to collapse into one big set. If we use APPEND for our
+reducing function, the result won’t be a true set, because some elements
+will appear more than once. What reducing function should be used
+instead?
+||#
+
+;;extract the sets into seperate lists
+;;join them using union
+
+(defun split-to-unify (list)
+  (mapcar #'(lambda (x)
+              (union x))
+          list))
+
+
