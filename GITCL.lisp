@@ -2038,12 +2038,184 @@ will appear more than once. What reducing function should be used
 instead?
 ||#
 
-;;extract the sets into seperate lists
-;;join them using union
+;; CL-USER> (reduce #'union
+;;                      '((one un) (two deux) (three trois)))
+;; (DEUX TWO ONE UN THREE TROIS)
+;; CL-USER
 
-(defun split-to-unify (list)
-  (mapcar #'(lambda (x)
-              (union x))
-          list))
+;; Write a function that, given a list of lists, returns the total length of all
+;; the lists. This problem can be solved two different ways.
+
+(defun length-of-nested (list-of-lists)
+  (reduce #'+ (mapcar #'(lambda (nested-list)
+                      (length nested-list))
+                  list-of-lists)))
+
+;;(REDUCE #’+ NIL) returns 0, but (REDUCE #’* NIL) returns 1.
+;;Why do you think this is?
+
+;;when you times nil to nil it becomes true like a nand gate
+;;two negatives make a truth
+;;two black holes cancel eachother out
 
 
+;;  Write a function ALL-ODD that returns T if every element of a list of
+;; numbers is odd.
+
+(defun all-odd (list)
+  (every #'oddp list))
+
+;; Write a function NONE-ODD that returns T if every element of a list of
+;; numbers is not odd.
+
+(defun none-odd (list)
+  (every #'even list))
+
+;; Write a function NOT-ALL-ODD that returns T if not every element of
+;; a list of numbers is odd.
+
+(defun not-all-odd (list)
+  (some #'(lambda (x)
+              (evenp x))
+        list))
+
+;; Write a function NOT-NONE-ODD that returns T if it is not the case
+;; that a list of numbers contains no odd elements
+;; this is ridiculous
+
+(defun not-none-odd (list)
+  (every #'oddp list))
+
+;; Are all four of the above functions distinct from one another, or are
+;; some of them the same? Can you think of better names for the last
+;; two? some-odd and all-odd
+
+;;What is an applicative operator?
+;;something that is very useful
+
+;;Why are lambda expressions useful? Is it possible to do without them?
+;;they are useful because you can break large lists into thier eserate elements and check them. It's possible to do without them but it would be a huge confusing mess full of mistakes
+
+;;Show how to write FIND-IF given REMOVE-IF-NOT.
+;;find something if it is like this
+;;remove something if it isnt like this
+;;dont remove something is it isnt like this, put it into a new list
+;;put this thing into a list
+
+(defun my-find-if (predicate list)
+  (car (remove-if-not #'(lambda (x)
+                           (funcall predicate x))
+                       list)))
+
+;;Show how to write EVERY given REMOVE-IF.
+;;for every predicate true in the list return x
+;;if predicate true is in the list remove it is if is not true
+
+(defun my-every (predicate list)
+  (remove-if #'(lambda (x)
+                   (not (funcall predicate x)))
+             (remove-if #'(lambda (x) (funcall predicate x)) list)))
+
+(defun second-try (predicate list)
+  (remove-if #'(lambda (x)
+                 (not (funcall predicate x)))
+             list))
+
+(defun thrid-try (predicate list)
+  (remove-if #'(lambda (x)
+                 (unless (funcall predicate x)
+                   nil))
+             list))
+
+;;if all of the elements are even the list length should stay the same!
+
+(defun my-every (predicate list)
+  (equalp (length list)
+          (length (remove-if #'(lambda (x)
+                                 (not (funcall predicate x)))
+                             list))))
+
+;;learning trace
+
+(defun half (n) (* n 0.5))
+
+(defun average (x y)
+  (+ (half x) (half y)))
+
+;;Avoid tracing the most fundamental
+;;built-in functions such as EVAL, CONS, and +. Otherwise your Lisp might
+;;end up in an infinite loop, and you will have to abandon it and start over
+
+;;keyboard exercise
+
+(defparameter *database*
+  '((b1 shape brick)
+    (b1 color green)
+    (b1 size small)
+    (b1 supported-by b2)
+    (b1 supported-by b3)
+    (b2 shape brick)
+    (b2 color red)
+    (b2 size small)
+    (b2 supports b1)
+    (b2 left-of b3)
+    (b3 shape brick)
+    (b3 color red)
+    (b3 size small)
+    (b3 supports b1)
+    (b3 right-of b2)
+    (b4 shape pyramid)
+    (b4 color blue)
+    (b4 size large)
+    (b4 supported-by b5)
+    (b5 shape cube)
+    (b5 color green)
+    (b5 size large)
+    (b5 supports b4)
+    (b6 shape brick)
+    (b6 color purple)
+    (b6 size large)))
+
+#||
+a. Write a function MATCH-ELEMENT that takes two symbols as
+inputs. If the two are equal, or if the second is a question mark,
+MATCH-ELEMENT should return T. Otherwise it should return
+NIL. Thus (MATCH-ELEMENT ’RED ’RED) and (MATCH-
+ELEMENT ’RED ’?) should return T, but (MATCH-ELEMENT
+’RED ’BLUE) should return NIL. Make sure your function works
+correctly before proceeding further.
+||#
+
+(defun match-element (one two)
+  (or (equalp one two)
+      (equalp '? two)))
+
+#||
+Write a function MATCH-TRIPLE that takes an assertion and a
+pattern as input, and returns T if the assertion matches the pattern.
+Both inputs will be three-element lists. (MATCH-TRIPLE ’(B2
+COLOR RED) ’(B2 COLOR ?)) should return
+T. (MATCH-TRIPLE ’(B2 COLOR RED) ’(B1 COLOR GREEN))
+should return NIL. Hint: Use MATCH-ELEMENT as a building
+block.
+||#
+
+(defun match-triple (assertion pattern)
+  (and (match-element (first assertion) (first pattern))
+       (match-element (second assertion) (second pattern))
+       (match-element (third assertion) (third pattern))))
+              
+
+#||
+. Write the function FETCH that takes a pattern as input and returns
+all assertions in the database that match the pattern. Remember that DATABASE is a global variable. (FETCH ’(B2 COLOR ?))
+should return ((B2 COLOR RED)), and (FETCH ’(? SUPPORTS
+B1)) should return ((B2 SUPPORTS B1) (B3 SUPPORTS B1)).
+||#
+;;this is similar to sql
+
+(defun fetch (pattern)
+  (remove-if-not #'(lambda (x)
+                     (match-triple x pattern))
+                 *database*))
+       
