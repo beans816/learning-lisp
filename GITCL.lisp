@@ -2218,4 +2218,110 @@ B1)) should return ((B2 SUPPORTS B1) (B3 SUPPORTS B1)).
   (remove-if-not #'(lambda (x)
                      (match-triple x pattern))
                  *database*))
-       
+
+
+#||
+Write a function that takes a block name as input and returns a
+pattern asking the color of the block. For example, given the input
+B3, your function should return the list (B3 COLOR ?)
+||#
+
+(defun query-color (name)
+  (list name 'color '?))
+
+#||
+Write a function SUPPORTERS that takes one input, a block, and
+returns a list of the blocks that support it. (SUPPORTERS ’B1)
+should return the list (B2 B3). Your function should work by
+constructing a pattern containing the block’s name, using that
+pattern as input to FETCH, and then extracting the block names
+from the resulting list of assertions.
+||#
+;;oh we're making egypt again
+;;(b1 supported-by ?)
+
+(defun query-supporter (block)
+  (list block 'supported-by '?))
+
+(defun supporters (block)
+  (mapcar #'(lambda (x)
+              (third x))
+          (fetch (query-supporter block))))
+
+#||
+Write a predicate SUPP-CUBE that takes a block as input and
+returns true if that block is supported by a cube. (SUPP-CUBE ’B4)
+should return a true value; (SUPP-CUBE ’B1) should not because
+B1 is supported by bricks but not cubes. Hint: Use the result of the
+SUPPORTERS function as a starting point.
+||#
+
+(defun supp-cube (block)
+  (if (equalp (last (assoc block *database*)) 'cube)
+      (supporters block)
+      nil))
+#||
+We are going to write a DESCRIPTION function that returns the
+description of a block. (DESCRIPTION ’B2) will return (SHAPE
+BRICK COLOR RED SIZE SMALL SUPPORTS B1 LEFT-OF
+B3). 
+
+We will do this in steps. First, write a function DESC1 that
+takes a block as input and returns all assertions dealing with that
+block. (DESC1 ’B6) should return ((B6 SHAPE BRICK) (B6
+COLOR PURPLE) (B6 SIZE LARGE))
+||#
+
+(defun desc1 (block)
+  (remove-if-not #'(lambda (x)
+              (equalp (car x) block))
+                 *database*))
+
+;;first remove the first element in the nested list
+;;then join all of them together with reduce
+
+(defun description (block)
+  (reduce #'append (mapcar #'rest (desc1 block))))
+;;woops accidentaly solved now cant do the next questions t.t
+
+;;k. What is the description of block B1? Of block B4?
+;;CL-USER> (description 'b1)
+;;(SHAPE BRICK COLOR GREEN SIZE SMALL SUPPORTED-BY B2 SUPPORTED-BY B3)
+
+;;l. Block B1 is made of wood, but block B2 is made of plastic. How
+;;would you add this information to the database?
+
+;;type it /append it to the list
+
+;;this is how you can assign everyone a job in a nice orderly fashion
+#||
+CL-USER> (mapcar #'(lambda (x y) (list x 'gets y))
+'(fred wilma george diane)
+'(job1 job2 job3 job4))
+((FRED GETS JOB1) (WILMA GETS JOB2) (GEORGE GETS JOB3) (DIANE GETS JOB4))
+||#
+
+;;this is how you can add a number to a number in a orderly fashion
+#||
+CL-USER> (mapcar #'+ '(1 2 3 4 5) '(60 70 80 90 100))
+(61 72 83 94 105)
+||#
+
+   
+#||
+Recall the English–French dictionary we stored in the global variable
+WORDS earlier in the chapter. Given this dictionary plus the list or
+corresponding Spanish words (UNO DOS TRES QUATRO CINCO), write an expression to return a trilingual dictionary. The first entry of the dictionary should be (ONE UN UNO).
+||#
+
+(defparameter *words*
+  '((one un)
+    (two deux)
+    (three trois)
+    (four quatre)
+    (five cinq)))
+
+(defun add-language (lang)
+  (mapcar #'(lambda (x y)
+              (append x (cons y ())))
+          *words* lang))
